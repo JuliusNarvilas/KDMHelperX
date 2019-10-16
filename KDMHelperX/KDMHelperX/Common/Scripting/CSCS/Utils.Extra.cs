@@ -341,16 +341,16 @@ namespace SplitAndMerge
             return results;
         }
 
-        //public static void PrintColor(string output, ConsoleColor fgcolor)
-        //{
-        //    ConsoleColor currentForeground = Console.ForegroundColor;
-        //    Console.ForegroundColor = fgcolor;
+        public static void PrintColor(string output, ConsoleColor fgcolor)
+        {
+            ConsoleColor currentForeground = Console.ForegroundColor;
+            Console.ForegroundColor = fgcolor;
 
-        //    Interpreter.Instance.AppendOutput(output);
-        //    //Console.Write(output);
+            Interpreter.Instance.AppendOutput(output);
+            Console.WriteLine(output);
 
-        //    Console.ForegroundColor = currentForeground;
-        //}
+            Console.ForegroundColor = currentForeground;
+        }
 
         public static void GetDir(string dir = "./", bool recursive = true)
         {
@@ -476,16 +476,16 @@ namespace SplitAndMerge
             ParsingScript argScript = new ParsingScript(adjArgs);
             List<Variable> args = argScript.GetFunctionArgs();
 
-            ParserFunction function = ParserFunction.GetFunction(functionName, null);
-            if (function is CustomCompiledFunction)
-            {
-                CustomCompiledFunction customFunction = function as CustomCompiledFunction;
-                Variable result = customFunction.Run(args);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
+            //ParserFunction function = ParserFunction.GetFunction(functionName, null);
+            //if (function is CustomCompiledFunction)
+            //{
+            //    CustomCompiledFunction customFunction = function as CustomCompiledFunction;
+            //    Variable result = customFunction.Run(args);
+            //    if (result != null)
+            //    {
+            //        return result;
+            //    }
+            //}
             return Calculate(functionName, argsString);
         }
 #endif
