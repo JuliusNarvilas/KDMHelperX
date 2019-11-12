@@ -16,5 +16,33 @@ namespace KDMHelperX.Views.Property
         {
             InitializeComponent();
         }
+
+        void OnIncrement(object sender, EventArgs args)
+        {
+            long result = 0;
+            if(long.TryParse(NumberInput.Text, out result))
+            {
+                result++;
+                NumberInput.Text = result.ToString();
+            }
+            else
+            {
+                NumberInput.Text = "0";
+            }
+        }
+
+        void OnDecrement(object sender, EventArgs args)
+        {
+            long result = 0;
+            if (long.TryParse(NumberInput.Text, out result))
+            {
+                result--;
+                NumberInput.Text = result.ToString();
+            }
+            else
+            {
+                NumberInput.Text = "0";
+            }
+        }
     }
 }

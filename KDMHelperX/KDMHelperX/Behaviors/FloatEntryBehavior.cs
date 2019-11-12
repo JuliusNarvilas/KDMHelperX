@@ -7,12 +7,11 @@ namespace KDMHelperX.Behaviors
 {
     public class FloatEntryBehavior : Behavior<Entry>
     {
-        public static readonly BindableProperty IsValidProperty = BindableProperty.Create("IsValid", typeof(bool), typeof(IntEntryBehavior), false);
-        public static readonly BindableProperty IsRequiredProperty = BindableProperty.Create("IsRequired", typeof(bool), typeof(IntEntryBehavior), false);
-        public static readonly BindableProperty MinValueProperty = BindableProperty.Create("MinValue", typeof(long), typeof(IntEntryBehavior), (long)int.MinValue);
-        public static readonly BindableProperty MaxValueProperty = BindableProperty.Create("MaxValue", typeof(long), typeof(IntEntryBehavior), (long)int.MaxValue);
+        public static readonly BindableProperty IsValidProperty = BindableProperty.Create("IsValid", typeof(bool), typeof(FloatEntryBehavior), false);
+        public static readonly BindableProperty IsRequiredProperty = BindableProperty.Create("IsRequired", typeof(bool), typeof(FloatEntryBehavior), false);
+        public static readonly BindableProperty MinValueProperty = BindableProperty.Create("MinValue", typeof(long), typeof(FloatEntryBehavior), double.NegativeInfinity);
+        public static readonly BindableProperty MaxValueProperty = BindableProperty.Create("MaxValue", typeof(long), typeof(FloatEntryBehavior), double.PositiveInfinity);
 
-        private bool m_insideChangeCallback = true;
 
         public long MinValue
         {
@@ -32,26 +31,19 @@ namespace KDMHelperX.Behaviors
         }
         public bool IsRequired
         {
-            get { return (bool)GetValue(IsValidProperty); }
-            set { SetValue(IsValidProperty, value); }
+            get { return (bool)GetValue(IsRequiredProperty); }
+            set { SetValue(IsRequiredProperty, value); }
         }
 
-        private bool TestIfConditionsAreValid(string value)
+
+        public bool TestIfConditionsAreValid(string value)
         {
-            bool valueIsRequired = IsRequired;
             if (string.IsNullOrEmpty(value))
             {
-                return !valueIsRequired;
+                return !IsRequired;
             }
             else
             {
-                if (value[0] == '-')
-                {
-                    //"-" is not a valid number even for non required values
-                    if(value.Length == 1)
-                        return false;
-                }
-
                 double parsedValue;
                 if (double.TryParse(value, out parsedValue))
                 {
@@ -61,7 +53,15 @@ namespace KDMHelperX.Behaviors
             return false;
         }
 
-        private bool TestIfNumberIsValid(string value)
+        /// <summary>
+        /// Validates a string that should represent a number of double type
+        /// </summary>
+        /// <remarks>
+        /// This only allows for decimal notation strings without display seperattors. Empty string is also valid.
+        /// </remarks>
+        /// <param name="value"></param>
+        /// <returns>Returns <code>true</code> for a valid number string and false otherwise.</returns>
+        public bool TestIfNumberIsValid(string value)
         {
             bool hadDot = false;
             bool wasValid = true;
@@ -74,28 +74,37 @@ namespace KDMHelperX.Behaviors
                 {
                     if (currentChar == '-')
                     {
-                        if (valueStrIndex == 0 && value.Length > 1)
+                        //"-" without a number is not a valid number string
+                        if (valueStrIndex != 0 || valueSize <= 1)
                         {
-                            continue;
+                            wasValid = false;
+                            break;
                         }
                     }
-                    else if (!hadDot && currentChar == '.')
+                    else if (currentChar == '.' && !hadDot)
                     {
-                        if(!hadDot && valueStrIndex > 0 && char.IsDigit(value[valueStrIndex-1]))
+                        hadDot = true;
+                        //do NOT allow string to start with "."
+                        //or end with "."
+                        //or "-" to directly precede "." ("." should be preceded by a digit)
+                        if (valueStrIndex <= 0 || (valueStrIndex + 1) < valueSize || value[valueStrIndex - 1] == '-')
                         {
-                            hadDot = true;
-                            continue;
+                            wasValid = false;
+                            break;
                         }
                     }
-                    wasValid = false;
-                    break;
+                    else
+                    {
+                        wasValid = false;
+                        break;
+                    }
                 }
             }
 
             return wasValid;
         }
 
-        private bool TestIfValid(string value)
+        public bool TestIfValid(string value)
         {
             bool finalIsValid = true;
             if (!string.IsNullOrEmpty(value))
@@ -128,22 +137,7 @@ namespace KDMHelperX.Behaviors
 
         private void bindable_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (m_insideChangeCallback)
-                return;
-
-            m_insideChangeCallback = true;
-
-            if (TestIfValid(e.NewTextValue))
-            {
-                IsValid = true;
-            }
-            else
-            {
-                //return old value
-                ((Entry)sender).Text = e.OldTextValue;
-            }
-
-            m_insideChangeCallback = false;
+            IsValid = TestIfValid(e.NewTextValue);
         }
     }
 }

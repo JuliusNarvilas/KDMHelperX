@@ -4,10 +4,30 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             x:Class="KDMHelperX.Views.Property.IntEditView">
+             x:Class="KDMHelperX.Views.Property.IntEditView"
+             xmlns:local="clr-namespace:KDMHelperX"
+             xmlns:local_beh="clr-namespace:KDMHelperX.Behaviors">
   <ContentView.Content>
-      <StackLayout>
-          <Label Text="Hello Xamarin.Forms!" />
-      </StackLayout>
-  </ContentView.Content>
+        <StackLayout Orientation="Horizontal" MinimumWidthRequest="100">
+            <Entry x:Name="NumberInput">
+                <Entry.Behaviors>
+                    <local_beh:IntEntryBehavior x:Name="NumberInputBehavior"/>
+                </Entry.Behaviors>
+                <Entry.Style>
+                    <Style TargetType="Entry">
+                        <Style.Triggers>
+                            <DataTrigger TargetType="Entry" Binding="{Binding Source={x:Reference NumberInputBehavior}, Path=IsValid}" Value="False">
+                                <Setter Property="BackgroundColor" Value="#de3535"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Entry.Style>
+            </Entry>
+
+            <StackLayout Orientation="Horizontal" Spacing="2">
+                <Button Text="^" Clicked="OnIncrement"></Button>
+                <Button Text="v" Clicked="OnDecrement"></Button>
+            </StackLayout>
+        </StackLayout>
+    </ContentView.Content>
 </ContentView>

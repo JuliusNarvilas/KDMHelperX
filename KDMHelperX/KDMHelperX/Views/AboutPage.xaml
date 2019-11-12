@@ -6,7 +6,8 @@
              mc:Ignorable="d"
              x:Class="KDMHelperX.Views.AboutPage"
              xmlns:vm="clr-namespace:KDMHelperX.ViewModels"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             xmlns:local_view_prop="clr-namespace:KDMHelperX.Views.Property">
     
     <ContentPage.BindingContext>
         <vm:AboutViewModel />
@@ -34,6 +35,11 @@
         </StackLayout>
         <ScrollView Grid.Row="1">
             <StackLayout Orientation="Vertical" Padding="16,40,16,40" Spacing="10">
+
+                <local_view_prop:IntEditView/>
+                <local_view_prop:IntEditView/>
+                <local_view_prop:IntEditView/>
+
                 <Label FontSize="22">
                     <Label.FormattedText>
                         <FormattedString>
